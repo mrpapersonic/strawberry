@@ -2,6 +2,66 @@ Strawberry Music Player
 =======================
 ChangeLog
 
+Version 1.2.14 (2025.10.25):
+
+  Bugfixes:
+    * Fixed showing error dialog minimized when main window is not current active window (#1739)
+    * Fixed Discord timestamp update when seeking (#1813)
+    * Fixed CD metadata lookup to respect MusicBrainz rate limiting
+    * Fixed Tidal Open API cover provider
+    * (Windows) Fixed device selection with WASAPI2
+
+  Enhancements/Other:
+    * Removed libre.fm support
+    * Rewrote MusicBrainzClient to use Json instead of XML
+    * Subsonic will now use cover art from album when available
+    * Added option to remove "Remastered", etc from song titles for Tidal, Qobuz and Spotify
+    * Added webm to supported file extensions
+    * (Windows|MinGW) Added WASAPI2 support
+    * (Windows) Added experimental exclusive mode for WASAPI2
+
+Version 1.2.13 (2025.08.31):
+
+  Bugfixes:
+    * Fixed playlist alternating row colors no longer working with some styles (#1806)
+    * Fixed "Open Audio CD" no longer working (#1803)
+    * Fixed systemtray icon playback status not working with scaling (#1782)
+    * Fixed build without MusicBrainz (#1799)
+    * Fixed build without MTP (#1804)
+
+  Enhancements:
+    * Added Discord status text option (#1796)
+    * Read Vorbis/FLAC "Other" embedded covers if front cover is not available (#1793)
+
+Version 1.2.12 (2025.08.12):
+
+  Bugfixes:
+    * Fixed scrobbling for radio streams.
+    * Fixed CDDA memory leaks.
+    * Fixed device view CDDA loading (#1676).
+    * Fixed collection directory editing (#1767).
+    * Fixed devices sometimes being duplicated in the database.
+    * Fixed alternating playlist row colors with Windows 11 style.
+    * Fixed broken file filter for GME formats.
+    * Fixed collection scanning for GME formats.
+    * Fixed Chartlyrics.
+    * Fixed network cache file descriptor leak on lyrics search with workaround for QTBUG-135641.
+    * Fixed parsing Tidal urls with certain stream URL replies.
+    * Fixed pixelated window icon on Wayland (#1753).
+    * Fixed saving collection grouping with special characters in the name (#1758).
+    * Fixed Spotify token not automatically updated on renewal when playing (#1769).
+    * (macOS/Windows) Fixed network cache file descriptor leak with patch for QTBUG-135641.
+    * (Windows|MSVC) Fixed installer to not restart the computer after installing Visual C++ Redistributable.
+
+  Enhancements:
+    * Implemented edit tag dialog reset for year, track, disc and rating.
+    * Added ALAC to supported filetypes for iPods.
+    * Added CD-TEXT support.
+    * Added back Genius lyrics.
+    * Added support for reporting more info to ListenBrainz.
+    * Added support for BPM, mood and initial key tags.
+    * Added support for sort tags to collection, playlists and smart playlists.
+
 Version 1.2.11 (2025.05.15):
 
     * Fixed playlist songs sometimes not updated with new cover.

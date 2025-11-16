@@ -1183,11 +1183,11 @@ If there are no matches then it will use the largest image in the directory.</tr
     </message>
     <message>
       <source>Queue track</source>
-      <translation>Parçayı sıraya al</translation>
+      <translation>Çalma sırasına ekle</translation>
     </message>
     <message>
       <source>Queue to play next</source>
-      <translation>Çalınacaklar sırası</translation>
+      <translation>Sıradaki Yap</translation>
     </message>
     <message>
       <source>Search for this</source>
@@ -3196,7 +3196,7 @@ If there are no matches then it will use the largest image in the directory.</tr
     </message>
     <message>
       <source>Open audio &amp;CD...</source>
-      <translation>Ses CDsi aç</translation>
+      <translation>Ses CD'si aç...</translation>
     </message>
     <message>
       <source>&amp;Cover Manager</source>
@@ -3412,7 +3412,7 @@ If there are no matches then it will use the largest image in the directory.</tr
     </message>
     <message>
       <source>Queue selected tracks to play next</source>
-      <translation type="unfinished">Queue selected tracks to play next</translation>
+      <translation>Seçilen parçaları sıradaki yap</translation>
     </message>
     <message>
       <source>Toggle skip status</source>
@@ -3488,7 +3488,7 @@ If there are no matches then it will use the largest image in the directory.</tr
     </message>
     <message>
       <source>Queue track</source>
-      <translation>Parçayı sıraya al</translation>
+      <translation>Çalma sırasına ekle</translation>
     </message>
     <message>
       <source>Queue selected tracks</source>
@@ -3496,7 +3496,7 @@ If there are no matches then it will use the largest image in the directory.</tr
     </message>
     <message>
       <source>Queue to play next</source>
-      <translation>Çalınacaklar sırası</translation>
+      <translation>Sıradaki Yap</translation>
     </message>
     <message>
       <source>Unskip track</source>
@@ -3575,7 +3575,7 @@ If there are no matches then it will use the largest image in the directory.</tr
     </message>
     <message>
       <source>Do not show this message again.</source>
-      <translation type="unfinished">Do not show this message again.</translation>
+      <translation>Bu mesajı bir daha gösterme.</translation>
     </message>
   </context>
   <context>
@@ -3737,7 +3737,7 @@ If there are no matches then it will use the largest image in the directory.</tr
     </message>
     <message>
       <source>Popup duration</source>
-      <translation type="unfinished">Popup duration</translation>
+      <translation>Açılır pencere süresi</translation>
     </message>
     <message>
       <source> seconds</source>
@@ -3745,19 +3745,19 @@ If there are no matches then it will use the largest image in the directory.</tr
     </message>
     <message>
       <source>Disable duration</source>
-      <translation type="unfinished">Disable duration</translation>
+      <translation>Süreyi devre dışı bırak</translation>
     </message>
     <message>
       <source>Show a notification when I change the volume</source>
-      <translation type="unfinished">Show a notification when I change the volume</translation>
+      <translation>Ses seviyesini değiştirdiğimde bir bildirim göster</translation>
     </message>
     <message>
       <source>Show a notification when I change the repeat/shuffle mode</source>
-      <translation type="unfinished">Show a notification when I change the repeat/shuffle mode</translation>
+      <translation>Yinele/karıştır modunu değiştirdiğimde bir bildirim göster</translation>
     </message>
     <message>
       <source>Show a notification when I pause playback</source>
-      <translation type="unfinished">Show a notification when I pause playback</translation>
+      <translation>Oynatmayı durdurduğumda bir bildirim göster</translation>
     </message>
     <message>
       <source>Show a notification when I resume playback</source>
@@ -3769,11 +3769,11 @@ If there are no matches then it will use the largest image in the directory.</tr
     </message>
     <message>
       <source>Custom message settings</source>
-      <translation type="unfinished">Custom message settings</translation>
+      <translation>Özel mesaj ayarları</translation>
     </message>
     <message>
       <source>Use a custom message for notifications</source>
-      <translation type="unfinished">Use a custom message for notifications</translation>
+      <translation>Bildirimler için özel bir mesaj kullan</translation>
     </message>
     <message>
       <source>Preview</source>
@@ -3801,7 +3801,7 @@ If there are no matches then it will use the largest image in the directory.</tr
     </message>
     <message>
       <source>Text options</source>
-      <translation type="unfinished">Text options</translation>
+      <translation>Yazı seçenekleri</translation>
     </message>
     <message>
       <source>Choose font...</source>
@@ -4167,7 +4167,7 @@ If there are no matches then it will use the largest image in the directory.</tr
     </message>
     <message>
       <source>File extension</source>
-      <translation type="unfinished">File extension</translation>
+      <translation>Dosya uzantısı</translation>
     </message>
   </context>
   <context>
@@ -6127,7 +6127,7 @@ Devam etmek istediğinizden emin misiniz?</translation>
     </message>
     <message>
       <source>Queue track</source>
-      <translation>Parçayı sıraya al</translation>
+      <translation>Çalma sırasına ekle</translation>
     </message>
     <message>
       <source>Play next</source>
@@ -6231,7 +6231,7 @@ Devam etmek istediğinizden emin misiniz?</translation>
     <name>SongLoaderInserter</name>
     <message>
       <source>Error while loading audio CD.</source>
-      <translation>Ses CD&apos;si yüklenirken hata.</translation>
+      <translation>Ses CD'si yüklenirken hata.</translation>
     </message>
     <message>
       <source>Loading tracks</source>
@@ -6403,11 +6403,11 @@ Devam etmek istediğinizden emin misiniz?</translation>
     </message>
     <message>
       <source>Queue track</source>
-      <translation>Parçayı sıraya al</translation>
+      <translation>Çalma sırasına ekle</translation>
     </message>
     <message>
       <source>Queue to play next</source>
-      <translation>Çalınacaklar sırası</translation>
+      <translation>Sıradaki Yap</translation>
     </message>
     <message>
       <source>Remove from favorites</source>
@@ -6484,7 +6484,7 @@ Devam etmek istediğinizden emin misiniz?</translation>
     </message>
     <message>
       <source>Queue track</source>
-      <translation>Parçayı sıraya al</translation>
+      <translation>Çalma sırasına ekle</translation>
     </message>
     <message>
       <source>Add to artists</source>
@@ -7226,7 +7226,7 @@ Devam etmek istediğinizden emin misiniz?</translation>
     <name>TranscoderOptionsASF</name>
     <message>
       <source>Form</source>
-      <translation type="unfinished">Form</translation>
+      <translation>Biçim</translation>
     </message>
     <message>
       <source>Bitrate</source>
@@ -7320,7 +7320,7 @@ Devam etmek istediğinizden emin misiniz?</translation>
     <name>TranscoderOptionsOpus</name>
     <message>
       <source>Form</source>
-      <translation type="unfinished">Form</translation>
+      <translation>Biçim</translation>
     </message>
     <message>
       <source>Bitrate</source>
@@ -7328,19 +7328,19 @@ Devam etmek istediğinizden emin misiniz?</translation>
     </message>
     <message>
       <source> kbps</source>
-      <translation type="unfinished"> kbps</translation>
+      <translation> kbps</translation>
     </message>
   </context>
   <context>
     <name>TranscoderOptionsSpeex</name>
     <message>
       <source>Form</source>
-      <translation type="unfinished">Form</translation>
+      <translation>Biçim</translation>
     </message>
     <message>
       <source>Quality</source>
       <comment>Sound quality</comment>
-      <translation type="unfinished">Quality</translation>
+      <translation>Kalite</translation>
     </message>
     <message>
       <source>Bitrate</source>
@@ -7348,11 +7348,11 @@ Devam etmek istediğinizden emin misiniz?</translation>
     </message>
     <message>
       <source>automatic</source>
-      <translation type="unfinished">automatic</translation>
+      <translation>otomatik</translation>
     </message>
     <message>
       <source> kbps</source>
-      <translation type="unfinished"> kbps</translation>
+      <translation> kbps</translation>
     </message>
     <message>
       <source>Average bitrate</source>
@@ -7360,15 +7360,15 @@ Devam etmek istediğinizden emin misiniz?</translation>
     </message>
     <message>
       <source>disabled</source>
-      <translation type="unfinished">disabled</translation>
+      <translation>devre dışı</translation>
     </message>
     <message>
       <source>Encoding mode</source>
-      <translation type="unfinished">Encoding mode</translation>
+      <translation>Kodlama modu</translation>
     </message>
     <message>
       <source>Auto</source>
-      <translation type="unfinished">Auto</translation>
+      <translation>Otomatik</translation>
     </message>
     <message>
       <source>Ultra wide band (UWB)</source>

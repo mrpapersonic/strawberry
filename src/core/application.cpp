@@ -64,6 +64,7 @@
 #include "covermanager/opentidalcoverprovider.h"
 
 #include "lyrics/lyricsproviders.h"
+#include "lyrics/geniuslyricsprovider.h"
 #include "lyrics/ovhlyricsprovider.h"
 #include "lyrics/lololyricsprovider.h"
 #include "lyrics/musixmatchlyricsprovider.h"
@@ -76,7 +77,6 @@
 
 #include "scrobbler/audioscrobbler.h"
 #include "scrobbler/lastfmscrobbler.h"
-#include "scrobbler/librefmscrobbler.h"
 #include "scrobbler/listenbrainzscrobbler.h"
 #include "scrobbler/lastfmimport.h"
 #ifdef HAVE_SUBSONIC
@@ -172,6 +172,7 @@ class ApplicationImpl {
         lyrics_providers_([app]() {
           LyricsProviders *lyrics_providers = new LyricsProviders(app);
           // Initialize the repository of lyrics providers.
+          lyrics_providers->AddProvider(new GeniusLyricsProvider(lyrics_providers->network()));
           lyrics_providers->AddProvider(new OVHLyricsProvider(lyrics_providers->network()));
           lyrics_providers->AddProvider(new LoloLyricsProvider(lyrics_providers->network()));
           lyrics_providers->AddProvider(new MusixmatchLyricsProvider(lyrics_providers->network()));
@@ -204,7 +205,6 @@ class ApplicationImpl {
         scrobbler_([app]() {
           AudioScrobbler *scrobbler = new AudioScrobbler(app);
           scrobbler->AddService(make_shared<LastFMScrobbler>(scrobbler->settings(), app->network()));
-          scrobbler->AddService(make_shared<LibreFMScrobbler>(scrobbler->settings(), app->network()));
           scrobbler->AddService(make_shared<ListenBrainzScrobbler>(scrobbler->settings(), app->network()));
 #ifdef HAVE_SUBSONIC
           scrobbler->AddService(make_shared<SubsonicScrobbler>(scrobbler->settings(), app->network(), app->streaming_services()->Service<SubsonicService>(), app));

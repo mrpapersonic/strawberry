@@ -15,7 +15,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        opensuse_version: [ 'tumbleweed', 'leap:15.6' ]
+        opensuse_version: [ 'tumbleweed', 'leap:15.6', 'leap:16.0' ]
     container:
       image: opensuse/${{matrix.opensuse_version}}
     steps:
@@ -27,11 +27,11 @@ jobs:
       - name: Upgrade packages (Leap)
         if: matrix.opensuse_version != 'tumbleweed'
         run: zypper -n --gpg-auto-import-keys up
-      - name: Install gcc (Tumbleweed)
-        if: matrix.opensuse_version == 'tumbleweed'
+      - name: Install gcc
+        if: matrix.opensuse_version != 'leap:15.6'
         run: zypper -n --gpg-auto-import-keys in gcc gcc-c++
-      - name: Install gcc (Leap)
-        if: matrix.opensuse_version != 'tumbleweed'
+      - name: Install gcc (leap:15.6)
+        if: matrix.opensuse_version == 'leap:15.6'
         run: zypper -n --gpg-auto-import-keys in gcc14 gcc14-c++
       - name: Install packages
         run: >
@@ -83,7 +83,7 @@ jobs:
             sparsehash-devel
             rapidjson-devel
       - name: Install kdsingleapplication-qt6-devel
-        if: matrix.opensuse_version == 'tumbleweed'
+        if: matrix.opensuse_version != 'leap:15.6'
         run: zypper -n --gpg-auto-import-keys in kdsingleapplication-qt6-devel
       - name: Build and install KDSingleApplication
         if: matrix.opensuse_version == 'leap:15.6'
@@ -97,7 +97,7 @@ jobs:
           cmake --build build --config Release --parallel 4
           cmake --install build
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
           submodules: recursive
@@ -115,14 +115,14 @@ jobs:
       - name: Copy source tarball
         working-directory: build
         run: cp strawberry-*.tar.xz /usr/src/packages/SOURCES/
-      - name: Build RPM (Tumbleweed)
-        if: matrix.opensuse_version == 'tumbleweed'
+      - name: Build RPM
+        if: matrix.opensuse_version != 'leap:15.6'
         env:
           RPM_BUILD_NCPUS: 4
         working-directory: build
         run: rpmbuild -ba strawberry.spec
-      - name: Build RPM (Leap)
-        if: matrix.opensuse_version != 'tumbleweed'
+      - name: Build RPM (leap:15.6)
+        if: matrix.opensuse_version == 'leap:15.6'
         env:
           RPM_BUILD_NCPUS: 4
           CC: gcc-14
@@ -134,14 +134,14 @@ jobs:
         run: echo "subdir=$(echo ${{matrix.opensuse_version}} | sed 's/leap:/lp/g' | sed 's/\.//g')" > $GITHUB_OUTPUT
       - name: Upload source
         if: matrix.opensuse_version == 'tumbleweed'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: source
           path: |
             /usr/src/packages/SOURCES/*.xz
       - name: Upload rpm
         if: matrix.opensuse_version != 'tumbleweed'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: opensuse-${{steps.set-subdir.outputs.subdir}}
           path: |
@@ -156,7 +156,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        fedora_version: [ '41', '42' ]
+        fedora_version: [ '41', '42', '43' ]
     container:
       image: fedora:${{matrix.fedora_version}}
     steps:
@@ -209,7 +209,7 @@ jobs:
             sparsehash-devel
             rapidjson-devel
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
           submodules: recursive
@@ -234,7 +234,7 @@ jobs:
         working-directory: build
         run: rpmbuild -ba strawberry.spec
       - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: fedora-${{matrix.fedora_version}}
           path: |
@@ -307,7 +307,7 @@ jobs:
       - name: Remove files
         run: rm -rf /usr/lib64/qt6/lib/cmake/Qt6Sql/{Qt6QMYSQL*,Qt6QODBCD*,Qt6QPSQL*,Qt6QIBase*}
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
           submodules: recursive
@@ -333,7 +333,7 @@ jobs:
         run: rpmbuild -ba strawberry.spec
       - name: Upload artifacts
         if: matrix.openmandriva_version != 'cooker'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: openmandriva-${{matrix.openmandriva_version}}
           path: |
@@ -409,7 +409,7 @@ jobs:
           cmake --build build --config Release --parallel 4
           cmake --install build
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
           submodules: recursive
@@ -434,7 +434,7 @@ jobs:
         working-directory: build
         run: rpmbuild -ba strawberry.spec
       - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: mageia-${{matrix.mageia_version}}
           path: |
@@ -449,7 +449,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        debian_version: [ 'bookworm', 'trixie' ]
+        debian_version: [ 'bookworm', 'trixie', 'forky' ]
     container:
       image: debian:${{matrix.debian_version}}
     steps:
@@ -499,7 +499,11 @@ jobs:
             qt6-tools-dev-tools
             qt6-l10n-tools
             rapidjson-dev
+      - name: Install KDSingleApplication
+        if: matrix.debian_version != 'bookworm'
+        run: apt install -y libkdsingleapplication-qt6-dev
       - name: Build and install KDSingleApplication
+        if: matrix.debian_version == 'bookworm'
         run: |
           git clone --depth 1 --recurse-submodules https://github.com/KDAB/KDSingleApplication
           cd KDSingleApplication
@@ -507,7 +511,7 @@ jobs:
           cmake --build build --config Release --parallel 4
           cmake --install build
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
           submodules: recursive
@@ -524,7 +528,7 @@ jobs:
       - name: Copy deb
         run: cp ../*.deb .
       - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: debian-${{matrix.debian_version}}
           path: |
@@ -538,7 +542,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ubuntu_version: [ 'noble', 'oracular', 'plucky' ]
+        ubuntu_version: [ 'noble', 'plucky', 'questing' ]
     container:
       image: ubuntu:${{matrix.ubuntu_version}}
     steps:
@@ -591,7 +595,11 @@ jobs:
             qt6-tools-dev-tools
             qt6-l10n-tools
             rapidjson-dev
+      - name: Install KDSingleApplication
+        if: matrix.ubuntu_version != 'noble' && matrix.ubuntu_version != 'plucky'
+        run: apt install -y libkdsingleapplication-qt6-dev
       - name: Build and install KDSingleApplication
+        if: matrix.ubuntu_version == 'noble' || matrix.ubuntu_version == 'plucky'
         run: |
           git clone --depth 1 --recurse-submodules https://github.com/KDAB/KDSingleApplication
           cd KDSingleApplication
@@ -599,7 +607,7 @@ jobs:
           cmake --build build --config Release --parallel 4
           cmake --install build
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
           submodules: recursive
@@ -616,7 +624,7 @@ jobs:
       - name: Copy deb
         run: cp ../*.deb ../*.ddeb .
       - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: ubuntu-${{matrix.ubuntu_version}}
           path: |
@@ -631,7 +639,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ubuntu_version: [ 'noble', 'oracular', 'plucky' ]
+        ubuntu_version: [ 'noble', 'plucky', 'questing' ]
     container:
       image: ubuntu:${{matrix.ubuntu_version}}
     steps:
@@ -691,7 +699,7 @@ jobs:
           DEBIAN_FRONTEND: noninteractive
         run: apt install -y keyboxd
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
           submodules: recursive
@@ -727,13 +735,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         fetch-depth: 0
         submodules: recursive
     - name: Build FreeBSD
       id: build-freebsd
-      uses: vmactions/freebsd-vm@v1.2.0
+      uses: vmactions/freebsd-vm@v1.2.6
       with:
         usesh: true
         mem: 4096
@@ -752,13 +760,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         fetch-depth: 0
         submodules: recursive
     - name: Build OpenBSD
       id: build-openbsd
-      uses: vmactions/openbsd-vm@v1.1.8
+      uses: vmactions/openbsd-vm@v1.2.3
       with:
         usesh: true
         mem: 4096
@@ -779,7 +787,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        runner: [ 'macos-13', 'macos-15' ]
+        runner: [ 'macos-15' ]
         buildtype: [ 'release' ]
 
     runs-on: ${{ matrix.runner }}
@@ -818,7 +826,7 @@ jobs:
           rm -f uninstall.sh
 
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
           submodules: recursive
@@ -882,12 +890,7 @@ jobs:
         run: make deploy
 
       - name: Manually Codesign
-        if: github.repository == 'strawberrymusicplayer/strawberry' && github.event.pull_request.head.repo.fork == false && matrix.runner == 'macos-13'
-        working-directory: build
-        run: codesign -s 383J84DVB6 -f strawberry.app/Contents/Frameworks/{libpcre2-8.0.dylib,libpcre2-16.0.dylib,libpng16.16.dylib,libfreetype.6.dylib,libzstd.1.dylib} strawberry.app/Contents/Frameworks/png.framework/png strawberry.app
-
-      - name: Manually Codesign
-        if: github.repository == 'strawberrymusicplayer/strawberry' && github.event.pull_request.head.repo.fork == false && matrix.runner == 'macos-15'
+        if: github.repository == 'strawberrymusicplayer/strawberry' && github.event.pull_request.head.repo.fork == false
         working-directory: build
         run: codesign -s 383J84DVB6 -f strawberry.app/Contents/Frameworks/png.framework/png strawberry.app
 
@@ -969,7 +972,7 @@ jobs:
         run: echo "cmake_buildtype=$(echo ${{env.buildtype}} | awk '{print toupper(substr($0,0,1))tolower(substr($0,2))}')" >> $GITHUB_ENV
 
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
           submodules: recursive
@@ -1072,7 +1075,7 @@ jobs:
         run: echo "cmake_buildtype=$(echo ${{matrix.buildtype}} | sed 's/.*/\u&/')" >> $GITHUB_ENV
 
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
           submodules: recursive
@@ -1295,6 +1298,20 @@ jobs:
         shell: bash
         run: echo "cmake_buildtype=$(echo ${{matrix.buildtype}} | sed 's/.*/\u&/')" >> $GITHUB_ENV
 
+      - name: Show SDK versions
+        shell: bash
+        run: ls -la "c:/Program Files (x86)/Windows Kits/10/include"
+
+      - name: Set SDK version
+        if: matrix.arch != 'arm64'
+        shell: bash
+        run: echo "sdk_version=10.0.19041.0" >> $GITHUB_ENV
+
+      - name: Set SDK version
+        if: matrix.arch == 'arm64'
+        shell: bash
+        run: echo "sdk_version=10.0.26100.0" >> $GITHUB_ENV
+
       - name: Install rsync
         shell: cmd
         run: choco install --no-progress rsync
@@ -1323,7 +1340,9 @@ jobs:
 
       - name: Copy bin files
         shell: bash
-        run: cp /c/strawberry/c/bin/{patch.exe,strip.exe,strings.exe,objdump.exe} ${{env.prefix_path_unix}}/bin
+        run: |
+          cp /c/mingw64/bin/{strip.exe,strings.exe,objdump.exe} ${{env.prefix_path_unix}}/bin
+          cp /c/strawberry/c/bin/patch.exe ${{env.prefix_path_unix}}/bin
 
       - name: Delete conflicting files
         shell: bash
@@ -1377,11 +1396,11 @@ jobs:
         uses: ilammy/msvc-dev-cmd@v1
         with:
           arch: ${{matrix.arch}}
-          sdk: 10.0.20348.0
+          sdk: ${{env.sdk_version}}
           vsversion: 2022
 
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
           submodules: recursive
@@ -1493,14 +1512,11 @@ jobs:
         run: copy ${{env.prefix_path_backslash}}\lib\gstreamer-1.0\*.dll .\gstreamer-plugins\
 
       - name: Download copydlldeps.sh
-        if: matrix.arch != 'arm64'
         shell: bash
         working-directory: build
         run: curl -f -O -L https://raw.githubusercontent.com/strawberrymusicplayer/strawberry-mxe/master/tools/copydlldeps.sh
 
       - name: Copy dependencies
-        # copydlldeps.sh doesn't work with arm64 binaries.
-        if: matrix.arch != 'arm64'
         shell: bash
         working-directory: build
         run: >
@@ -1516,12 +1532,6 @@ jobs:
           -F ./gio-modules
           -F ./gstreamer-plugins
           -R ${{env.prefix_path_unix}}/bin
-
-      - name: Copy dependencies
-        if: matrix.arch == 'arm64'
-        shell: bash
-        working-directory: build
-        run: cp -v ${{env.prefix_path_unix}}/bin/{avcodec*.dll,avfilter*.dll,avformat*.dll,avutil*.dll,brotlicommon.dll,brotlidec.dll,chromaprint.dll,ebur128.dll,faad-2.dll,fdk-aac.dll,ffi-7.dll,FLAC.dll,freetype*.dll,getopt.dll,gio-2.0-0.dll,glib-2.0-0.dll,gme.dll,gmodule-2.0-0.dll,gobject-2.0-0.dll,gst-discoverer-1.0.exe,gst-launch-1.0.exe,gst-play-1.0.exe,gstadaptivedemux-1.0-0.dll,gstapp-1.0-0.dll,gstaudio-1.0-0.dll,gstbadaudio-1.0-0.dll,gstbase-1.0-0.dll,gstcodecparsers-1.0-0.dll,gstfft-1.0-0.dll,gstisoff-1.0-0.dll,gstmpegts-1.0-0.dll,gstnet-1.0-0.dll,gstpbutils-1.0-0.dll,gstreamer-1.0-0.dll,gstriff-1.0-0.dll,gstrtp-1.0-0.dll,gstrtsp-1.0-0.dll,gstsdp-1.0-0.dll,gsttag-1.0-0.dll,gsturidownloader-1.0-0.dll,gstvideo-1.0-0.dll,gstwinrt-1.0-0.dll,harfbuzz.dll,icudt*.dll,icuin*.dll,icuuc*.dll,intl-8.dll,jpeg62.dll,kdsingleapplication*.dll,libbs2b.dll,libcrypto-3-*.dll,fftw3.dll,libiconv*.dll,liblzma.dll,libmp3lame.dll,libopenmpt.dll,libpng16*.dll,libspeex*.dll,libssl-3-*.dll,libxml2*.dll,mpcdec.dll,mpg123.dll,nghttp2.dll,ogg.dll,opus.dll,orc-0.4-0.dll,pcre2-16*.dll,pcre2-8*.dll,postproc*.dll,psl-5.dll,Qt6Concurrent*.dll,Qt6Core*.dll,Qt6Gui*.dll,Qt6Network*.dll,Qt6Sql*.dll,Qt6Widgets*.dll,qtsparkle-qt6.dll,soup-3.0-0.dll,sqlite3.dll,sqlite3.exe,swresample*.dll,swscale*.dll,tag.dll,vorbis.dll,vorbisfile.dll,wavpackdll.dll,zlib*.dll} .
 
       - name: Copy nsis files
         shell: cmd
@@ -1623,11 +1633,11 @@ jobs:
           DEBIAN_FRONTEND: noninteractive
         run: sudo apt install -y git rsync
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
       - name: Download artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v6
         with:
           path: artifacts
       - name: SSH Setup
@@ -1671,7 +1681,7 @@ jobs:
           DEBIAN_FRONTEND: noninteractive
         run: sudo apt install -y git jq gh
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
       - name: Show release assets
@@ -1679,7 +1689,7 @@ jobs:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
         run: gh release view "${{github.event.release.tag_name}}" --json assets | jq -r '.assets[].name'
       - name: Download artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v6
         with:
           path: artifacts
       - name: Add artifacts to release

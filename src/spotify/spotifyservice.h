@@ -73,6 +73,7 @@ class SpotifyService : public StreamingService {
   int songssearchlimit() const { return songssearchlimit_; }
   bool fetchalbums() const { return fetchalbums_; }
   bool download_album_covers() const { return download_album_covers_; }
+  bool remove_remastered() const { return remove_remastered_; }
 
   bool authenticated() const override;
   QByteArray authorization_header() const;
@@ -88,6 +89,9 @@ class SpotifyService : public StreamingService {
   CollectionFilter *artists_collection_filter_model() override { return artists_collection_model_->filter(); }
   CollectionFilter *albums_collection_filter_model() override { return albums_collection_model_->filter(); }
   CollectionFilter *songs_collection_filter_model() override { return songs_collection_model_->filter(); }
+
+ Q_SIGNALS:
+  void UpdateSpotifyAccessToken(const QString &access_token);
 
  public Q_SLOTS:
   void Authenticate();
@@ -147,6 +151,7 @@ class SpotifyService : public StreamingService {
   int songssearchlimit_;
   bool fetchalbums_;
   bool download_album_covers_;
+  bool remove_remastered_;
 
   int pending_search_id_;
   int next_pending_search_id_;

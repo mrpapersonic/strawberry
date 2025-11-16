@@ -37,11 +37,17 @@
 #include <QFlags>
 #include <QPaintEvent>
 #include <QResizeEvent>
+#include <QGuiApplication>
 
 #include "core/iconloader.h"
 #include "lineedit.h"
 
 using namespace Qt::Literals::StringLiterals;
+
+namespace {
+constexpr int kClearIconSize = 16;
+constexpr int kResetIconSize = 16;
+}  // namespace
 
 ExtendedEditor::ExtendedEditor(QWidget *widget, int extra_right_padding, bool draw_hint)
     : LineEditInterface(widget),
@@ -54,7 +60,7 @@ ExtendedEditor::ExtendedEditor(QWidget *widget, int extra_right_padding, bool dr
       is_rtl_(false) {
 
   clear_button_->setIcon(IconLoader::Load(u"edit-clear-locationbar-ltr"_s));
-  clear_button_->setIconSize(QSize(16, 16));
+  clear_button_->setIconSize(QSize(kClearIconSize, kClearIconSize));
   clear_button_->setCursor(Qt::ArrowCursor);
   clear_button_->setStyleSheet(u"QToolButton { border: none; padding: 0px; }"_s);
   clear_button_->setToolTip(QWidget::tr("Clear"));
@@ -64,7 +70,7 @@ ExtendedEditor::ExtendedEditor(QWidget *widget, int extra_right_padding, bool dr
   opt.initFrom(widget);
 
   reset_button_->setIcon(widget->style()->standardIcon(QStyle::SP_DialogResetButton, &opt, widget));
-  reset_button_->setIconSize(QSize(16, 16));
+  reset_button_->setIconSize(QSize(kResetIconSize, kResetIconSize));
   reset_button_->setCursor(Qt::ArrowCursor);
   reset_button_->setStyleSheet(u"QToolButton { border: none; padding: 0px; }"_s);
   reset_button_->setToolTip(QWidget::tr("Reset"));
@@ -113,8 +119,17 @@ void ExtendedEditor::UpdateButtonGeometry() {
   const int frame_width = widget_->style()->pixelMetric(QStyle::PM_DefaultFrameWidth);
   const int left = frame_width + 1 + (has_clear_button() ? clear_button_->sizeHint().width() : 0);
   const int right = frame_width + 1 + (has_reset_button() ? reset_button_->sizeHint().width() : 0);
+  const char *const class_name = widget_->metaObject()->className();
 
-  widget_->setStyleSheet(QStringLiteral("QLineEdit { padding-left: %1px; padding-right: %2px; }").arg(left).arg(right));
+  if (strcmp(class_name, "LineEdit") == 0) {
+    // Seems Qt inverts left/right padding for QLineEdit if layout direction RTL
+    const bool rtl = QGuiApplication::isRightToLeft();
+    widget_->setStyleSheet(QStringLiteral("QLineEdit { padding-left: %1px; padding-right: %2px; }").arg(rtl ? right : left).arg(rtl ? left : right));
+  }
+  else if (strcmp(class_name, "TextEdit") == 0) {
+    // But not for QPlainTextEdit
+    widget_->setStyleSheet(QStringLiteral("QPlainTextEdit { padding-left: %1px; padding-right: %2px; }").arg(left).arg(right));
+  }
 
   QSize msz = widget_->minimumSizeHint();
   widget_->setMinimumSize(msz.width() + (clear_button_->sizeHint().width() + frame_width + 1) * 2 + extra_right_padding_, qMax(msz.height(), clear_button_->sizeHint().height() + frame_width * 2 + 2));
@@ -220,7 +235,19 @@ SpinBox::SpinBox(QWidget *parent)
     : QSpinBox(parent),
       ExtendedEditor(this, 14, false) {
 
+  if (QGuiApplication::isRightToLeft()) {
+    extra_right_padding_ = 0; // Up/down arrows on left
+  }
   QObject::connect(reset_button_, &QToolButton::clicked, this, &SpinBox::Reset);
+}
+
+QString SpinBox::textFromValue(int val) const {
+
+  if (val <= 0 && !hint_.isEmpty()) {
+    return u"-"_s;
+  }
+  return QSpinBox::textFromValue(val);
+
 }
 
 void SpinBox::paintEvent(QPaintEvent *e) {
@@ -234,8 +261,10 @@ void SpinBox::resizeEvent(QResizeEvent *e) {
 }
 
 CheckBox::CheckBox(QWidget *parent)
-    : QCheckBox(parent), ExtendedEditor(this, 14, false) {
+    : QCheckBox(parent), ExtendedEditor(this, 4, false) {
 
+  has_clear_button_ = false;
+  is_rtl_ = QGuiApplication::isRightToLeft();
   QObject::connect(reset_button_, &QToolButton::clicked, this, &CheckBox::Reset);
 
 }
@@ -250,20 +279,46 @@ void CheckBox::resizeEvent(QResizeEvent *e) {
   Resize();
 }
 
-QString SpinBox::textFromValue(int val) const {
+void CheckBox::Resize() {
 
-  if (val <= 0 && !hint_.isEmpty()) {
-    return u"-"_s;
+  const QSize sz = widget_->sizeHint();
+  const int frame_width = widget_->style()->pixelMetric(QStyle::PM_DefaultFrameWidth);
+  const int y = (rect().height() - sz.height()) / 2 - frame_width; // Less frame width as outside
+
+  if (!is_rtl_) {
+    reset_button_->move(frame_width + sz.width() + extra_right_padding_, y); // Using `extra_right_padding_` as how far to right of checkbox
   }
-  return QSpinBox::textFromValue(val);
+  else {
+    reset_button_->move(rect().width() - (frame_width + sz.width() + kResetIconSize + extra_right_padding_), y);
+  }
 
 }
 
 RatingBox::RatingBox(QWidget *parent)
     : RatingWidget(parent),
-      ExtendedEditor(this) {
+      ExtendedEditor(this, 6) {
 
-  clear_button_->hide();
-  reset_button_->hide();
+  has_clear_button_ = false;
+  QObject::connect(reset_button_, &QToolButton::clicked, this, &RatingBox::Reset);
+
+}
+
+void RatingBox::paintEvent(QPaintEvent *e) {
+  RatingWidget::paintEvent(e);
+  Paint(this);
+}
+
+void RatingBox::resizeEvent(QResizeEvent *e) {
+  RatingWidget::resizeEvent(e);
+  Resize();
+}
+
+void RatingBox::Resize() {
+
+  const QSize sz = widget_->sizeHint();
+  const int frame_width = widget_->style()->pixelMetric(QStyle::PM_DefaultFrameWidth);
+  const int y = (rect().height() - sz.height()) / 2 + frame_width; // Plus frame width as inside
+
+  reset_button_->move(frame_width + rect().width() - (kResetIconSize + extra_right_padding_), y);
 
 }

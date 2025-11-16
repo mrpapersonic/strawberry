@@ -83,6 +83,7 @@ constexpr char InterAudiosink[] = "interaudiosink";
 constexpr char kDirectSoundSink[] = "directsoundsink";
 constexpr char kOSXAudioSink[] = "osxaudiosink";
 constexpr char kWASAPISink[] = "wasapisink";
+constexpr char kWASAPI2Sink[] = "wasapi2sink";
 constexpr int kDiscoveryTimeoutS = 10;
 constexpr qint64 kTimerIntervalNanosec = 1000 * kNsecPerMsec;  // 1s
 constexpr qint64 kPreloadGapNanosec = 8000 * kNsecPerMsec;     // 8s
@@ -471,7 +472,7 @@ EngineBase::OutputDetailsList GstEngine::GetOutputsList() const {
     const QStringList classes = metadata.split(u'/');
     if (classes.contains("Audio"_L1, Qt::CaseInsensitive) && (classes.contains("Sink"_L1, Qt::CaseInsensitive) || (classes.contains("Source"_L1, Qt::CaseInsensitive) && name.contains("sink"_L1)))) {
       QString description = QString::fromUtf8(gst_element_factory_get_metadata(factory, GST_ELEMENT_METADATA_DESCRIPTION));
-      if (name == "wasapi2sink"_L1 && description == "Stream audio to an audio capture device through WASAPI"_L1) {
+      if (name == QLatin1String(kWASAPI2Sink) && description == "Stream audio to an audio capture device through WASAPI"_L1) {
         description.append(u'2');
       }
       else if (name == "pipewiresink"_L1 && description == "Send video to PipeWire"_L1) {
@@ -512,14 +513,24 @@ bool GstEngine::ALSADeviceSupport(const QString &output) const {
 }
 
 bool GstEngine::ExclusiveModeSupport(const QString &output) const {
-  return output == QLatin1String(kWASAPISink);
+  return output == QLatin1String(kWASAPISink) || output == QLatin1String(kWASAPI2Sink);
 }
 
 void GstEngine::ReloadSettings() {
 
+#ifdef HAVE_SPOTIFY
+  const QString old_spotify_access_token = spotify_access_token_;
+#endif
+
   EngineBase::ReloadSettings();
 
   if (output_.isEmpty()) output_ = QLatin1String(kAutoSink);
+
+#ifdef HAVE_SPOTIFY
+  if (current_pipeline_ && old_spotify_access_token != spotify_access_token_) {
+    current_pipeline_->set_spotify_access_token(spotify_access_token_);
+  }
+#endif
 
 }
 
@@ -1199,3 +1210,13 @@ bool GstEngine::AnyExclusivePipelineActive() const {
   return (current_pipeline_ && current_pipeline_->exclusive_mode()) || OldExclusivePipelineActive();
 
 }
+
+#ifdef HAVE_SPOTIFY
+void GstEngine::SetSpotifyAccessToken() {
+
+  if (current_pipeline_) {
+    current_pipeline_->set_spotify_access_token(spotify_access_token_);
+  }
+
+}
+#endif  // HAVE_SPOTIFY
